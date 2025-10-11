@@ -205,6 +205,19 @@ defmodule ReqLLM.Provider.OptionsTest do
       assert processed[:max_completion_tokens] == 1000
       refute Keyword.has_key?(processed, :max_tokens)
     end
+
+    test "does not extract max_tokens: 0 (embedding models)" do
+      # Embedding models have max_tokens: 0 in their limit.output
+      # This should NOT be extracted as it's not a valid max_tokens value
+      model = %ReqLLM.Model{provider: :mock, model: "embedding-model", max_tokens: 0}
+      opts = [temperature: 0.5]
+
+      assert {:ok, processed} = Options.process(MockProvider, :chat, model, opts)
+
+      # max_tokens: 0 should NOT be extracted
+      refute Keyword.has_key?(processed, :max_tokens)
+      assert processed[:temperature] == 0.5
+    end
   end
 
   describe "Options.process/4 - req_http_options handling" do
