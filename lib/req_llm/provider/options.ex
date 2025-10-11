@@ -401,8 +401,7 @@ defmodule ReqLLM.Provider.Options do
   end
 
   defp extract_model_options(%ReqLLM.Model{} = model, opts) do
-    # Extract max_tokens from model struct if present
-    if model.max_tokens do
+    if model.max_tokens && model.max_tokens > 0 do
       Keyword.put_new(opts, :max_tokens, model.max_tokens)
     else
       opts
